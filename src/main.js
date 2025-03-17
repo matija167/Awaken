@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { pass } from 'three/tsl';
 
 const canvas = document.querySelector("#experience-canvas");
 const sizes = {
@@ -111,7 +112,22 @@ window.addEventListener("mousemove", (e) => {
     pointer.y = -(e.clientY / sizes.height) * 2 + 1;
 });
 
-window.addEventListener("click", (e) => {
+window.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    pointer.x = (e.touches[0].clientX / sizes.width) * 2 - 1;
+    pointer.y = -(e.touches[0].clientY / sizes.height) * 2 + 1;
+}, 
+{passive: false}
+);
+
+window.addEventListener("touchend", (e) => {
+    e.preventDefault();
+    handleRaycasterInteractions
+}, 
+{passive: false}
+);
+
+function handleRaycasterInteractions() {
     if (currentIntersects.length > 0) {
         const object = currentIntersects[0].object;
 
@@ -125,7 +141,10 @@ window.addEventListener("click", (e) => {
             }
         });
     }
-});
+};
+
+window.addEventListener("click", handleRaycasterInteractions);
+
 
 // Load Model
 loader.load("/models/Room_Portfolio.glb", (glb) => {
