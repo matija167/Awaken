@@ -17,6 +17,7 @@ const yAxisFans = [];
 const xAxisFans = [];
 const raycasterObjects = [];
 let currentIntersects = [];
+let currentHoveredObject = null;
 
 const socialLinks = {
     "Steam": "https://steamcommunity.com/id/2201763",
@@ -109,6 +110,7 @@ videoTexture.flipY = false;
 
 // Mouse Movement
 window.addEventListener("mousemove", (e) => {
+    //toucheHappened = false;
     pointer.x = (e.clientX / sizes.width) * 2 - 1;
     pointer.y = -(e.clientY / sizes.height) * 2 + 1;
 });
@@ -203,6 +205,11 @@ loader.load("/models/Room_Portfolio.glb", (glb) => {
             }
 
             // Add to raycaster objects
+            if (child.name.includes("Hover")) {
+                child.userData.initialScale = new THREE.Vector3().copy(child.scale);
+                child.userData.initialPosition = new THREE.Vector3().copy(child.position);
+                child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+            }
             if (child.name.includes("Raycaster")) {
                 raycasterObjects.push(child);
             }
@@ -225,6 +232,39 @@ window.addEventListener("resize", () => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
+function playHoverAnimation(object, isHovering) {
+    gsap.killTweensOf(object.scale);
+    gsap.killTweensOf(object.rotation);
+    gsap.killTweensOf(object.position);
+
+    if (isHovering) {
+        gsap.to(object.scale, {
+            x: object.userData.initialScale.x * 1.4,
+            y: object.userData.initialScale.y * 1.4,
+            z: object.userData.initialScale.z * 1.4,
+            duration: 0.5,
+            ease: "bounce.out(1.8)",
+        });
+        gsap.to(object.rotation, {
+            x: object.userData.initialRotation.x + Math.PI / 8,
+            duration: 0.5,
+            ease: "bounce.out(1.8)",
+        });
+    } else {
+        gsap.to(object.scale, {
+            x: object.userData.initialScale.x,
+            y: object.userData.initialScale.y,
+            z: object.userData.initialScale.z,
+            duration: 0.3,
+            ease: "bounce.out(1.8)",
+        });
+        gsap.to(object.rotation, {
+            x: object.userData.initialRotation.x,
+            duration: 0.3,
+            ease: "bounce.out(1.8)",
+        });
+    }
+}
 // Render Loop
 const render = () => {
     controls.update();
@@ -242,12 +282,37 @@ const render = () => {
 
     // Raycaster
     raycaster.setFromCamera(pointer, camera);
+
+    // calculate objects intersecting the picking ray
     currentIntersects = raycaster.intersectObjects(raycasterObjects);
 
+    for (let i = 0; i < currentIntersects.length; i++) {}
+
     if (currentIntersects.length > 0) {
+      const currentIntersectObject = currentIntersects[0].object;
+
+      if (currentIntersectObject.name.includes("Hover")) {
+        if (currentIntersectObject !== currentHoveredObject) {
+          if (currentHoveredObject) {
+            playHoverAnimation(currentHoveredObject, false);
+          }
+
+          playHoverAnimation(currentIntersectObject, true);
+          currentHoveredObject = currentIntersectObject;
+        }
+      }
+
+      if (currentIntersectObject.name.includes("Pointer")) {
         document.body.style.cursor = "pointer";
-    } else {
+      } else {
         document.body.style.cursor = "default";
+      }
+    } else {
+      if (currentHoveredObject) {
+        playHoverAnimation(currentHoveredObject, false);
+        currentHoveredObject = null;
+      }
+      document.body.style.cursor = "default";
     }
 
     renderer.render(scene, camera);
