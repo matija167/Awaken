@@ -4,12 +4,13 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { pass } from 'three/tsl';
+import gsap from "gsap";
 
 const canvas = document.querySelector("#experience-canvas");
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight,
-};
+}
 
 const zAxisFans = [];
 const yAxisFans = [];
@@ -122,12 +123,12 @@ window.addEventListener("touchstart", (e) => {
 
 window.addEventListener("touchend", (e) => {
     e.preventDefault();
-    handleRaycasterInteractions
+    handleRaycasterInteraction();
 }, 
 {passive: false}
 );
 
-function handleRaycasterInteractions() {
+function handleRaycasterInteraction() {
     if (currentIntersects.length > 0) {
         const object = currentIntersects[0].object;
 
@@ -143,8 +144,7 @@ function handleRaycasterInteractions() {
     }
 };
 
-window.addEventListener("click", handleRaycasterInteractions);
-
+window.addEventListener("click", handleRaycasterInteraction);
 
 // Load Model
 loader.load("/models/Room_Portfolio.glb", (glb) => {
