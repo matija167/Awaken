@@ -245,8 +245,8 @@ function playHoverAnimation(object, isHovering) {
             duration: 0.5,
             ease: "bounce.out(1.8)",
         });
-        gsap.to(object.rotation, {
-            x: object.userData.initialRotation.x + Math.PI / 8,
+        gsap.to(object.position, {
+            x: object.userData.initialPosition.x + Math.PI / 8,
             duration: 0.5,
             ease: "bounce.out(1.8)",
         });
@@ -258,8 +258,8 @@ function playHoverAnimation(object, isHovering) {
             duration: 0.3,
             ease: "bounce.out(1.8)",
         });
-        gsap.to(object.rotation, {
-            x: object.userData.initialRotation.x,
+        gsap.to(object.position, {
+            x: object.userData.initialPosition.x,
             duration: 0.3,
             ease: "bounce.out(1.8)",
         });
