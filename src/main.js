@@ -1,6 +1,6 @@
 import './style.scss';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { OrbitControls } from './utils/OrbitControls.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { pass } from 'three/tsl';
@@ -29,7 +29,7 @@ const pointer = new THREE.Vector2();
 // Scene and Camera
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, sizes.width / sizes.height, 0.1, 1000);
-camera.position.set(14.5, 13, 11.5);
+camera.position.set(20/1.2, 11/1.2, 13/1.2);
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
@@ -38,9 +38,17 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // Orbit Controls
 const controls = new OrbitControls(camera, renderer.domElement);
+
+controls.minDistance = 10;
+controls.maxDistance = 35;
+controls.minPolarAngle = 0;
+controls.maxPolarAngle = Math.PI / 2;
+controls.minAzimuthAngle = 0;
+controls.maxAzimuthAngle = Math.PI / 2;
+
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
-controls.target.set(0, 0, 0);
+controls.target.set(0, 3, 0);
 controls.update();
 
 // Loaders
