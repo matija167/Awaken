@@ -18,6 +18,7 @@ const xAxisFans = [];
 const raycasterObjects = [];
 let currentIntersects = [];
 let currentHoveredObject = null;
+let chairTop;
 
 const socialLinks = {
     "Steam": "https://steamcommunity.com/id/2201763",
@@ -221,6 +222,10 @@ loader.load("/models/Room_Portfolio.glb", (glb) => {
             if (child.name.includes("Raycaster")) {
                 raycasterObjects.push(child);
             }
+            if (child.name.includes("Chair_Fourth")) {
+                chairTop = child;
+                child.userData.initialRotation = new THREE.Euler().copy(child.rotation);
+            }
         }
     });
     scene.add(glb.scene);
@@ -273,11 +278,32 @@ function playHoverAnimation(object, isHovering) {
         });
     }
 }
-// Render Loop
-const render = () => {
-    controls.update();
 
-    // Animate Fans
+const clock = new THREE.Clock();
+
+// Render Loop
+
+
+
+
+
+const render = (timestamp) => {
+
+  //Update Orbit Controls
+  controls.update();
+
+    if (chairTop) {
+        const time = timestamp * 0.001;
+        const baseAmplitude = Math.PI / 8;
+    
+        const rotationOffset =
+          baseAmplitude *
+          Math.sin(time * 0.5) *
+          (1 - Math.abs(Math.sin(time * 0.5)) * 0.3);
+    
+        chairTop.rotation.y = chairTop.userData.initialRotation.y + rotationOffset;
+      }
+          // Animate Fans
     zAxisFans.forEach((fan) => {
         fan.rotation.z += 0.1;
     });
@@ -288,13 +314,13 @@ const render = () => {
         fan.rotation.x += 0.1;
     });
 
+
     // Raycaster
     raycaster.setFromCamera(pointer, camera);
 
     // calculate objects intersecting the picking ray
     currentIntersects = raycaster.intersectObjects(raycasterObjects);
 
-    for (let i = 0; i < currentIntersects.length; i++) {}
 
     if (currentIntersects.length > 0) {
       const currentIntersectObject = currentIntersects[0].object;
@@ -325,6 +351,7 @@ const render = () => {
 
     renderer.render(scene, camera);
     window.requestAnimationFrame(render);
+
 };
 
 render();
